@@ -11,7 +11,8 @@ const HomeScreen = () => {
 
   const chartWidth = Dimensions.get('window').width * 0.8 // 60% of screen
   
-
+  const tempval = 35
+  const humidval = 75
   const value = 900
   const totalValue = 6000
   const percentage = (value / totalValue) * 100
@@ -22,8 +23,25 @@ const HomeScreen = () => {
     if (val <= 4999) return theme.warning;          // warning-ish
     return theme.critical;                           // critical
   };
+  // Temperature (°C)
+  const getTempColor = (t) => {
+    if (t < 23) return theme.cool;       // Blue: malamig
+    if (t < 30) return theme.ok;         // Green: comfortable
+    if (t < 35) return theme.warning;    // Yellow: mainit
+    return theme.critical;               // Red: sobrang init
+  };
+
+  // Humidity (RH %)
+  const getHumidityColor = (h) => {
+    if (h < 40) return theme.cool;       // Blue: dry air
+    if (h < 70) return theme.ok;         // Green: typical
+    if (h < 80) return theme.warning;    // Yellow: very humid
+    return theme.critical;               // Red: extreme
+  };
 
   const gaugeColor = getGaugeColor(value);
+  const tempColor = getTempColor(tempval);
+  const humidColor = getHumidityColor(humidval);
 
   const data = [
   { value: 150,  label: '6 PM', dataPointColor: getGaugeColor(150)},
@@ -44,7 +62,7 @@ const HomeScreen = () => {
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 150,
+    paddingTop: 25,
     backgroundColor: theme.background,
   },
   head:{
@@ -116,7 +134,7 @@ const HomeScreen = () => {
     bottom: 10,
     height: '70%',
     width: 6,
-    backgroundColor: 'red',
+    backgroundColor: tempColor,
     position: 'absolute',
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
@@ -162,15 +180,51 @@ const HomeScreen = () => {
     height: 30,
     top: 0,
   },
+  predicttempText: {
+    fontSize: 9,
+    color: 'black',
+    opacity: 0.5,
+    top:7,
+    left: 5,
+    justifyContent: 'center',
+  },
   humidindicator: {
     top: 10,
     bottom: 10,
     height: '70%',
     width: 6,
-    backgroundColor: 'orange',
+    backgroundColor: humidColor,
     position: 'absolute',
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
+  },
+  humidtitle: {
+    position: 'absolute',
+    top: 10,
+    left: 20,
+    fontSize: 14,
+    color: 'black',
+    opacity: 0.5
+  },
+  humidvalue: {
+    position: 'absolute',
+    bottom: 10,
+    left: 20,
+    fontSize: 35,
+    color: 'black',
+  },
+  humidbutton: {
+    position: 'absolute',
+    top: 20,
+    right: 15, 
+  },
+  predicthumidText: {
+    fontSize: 9,
+    color: 'black',
+    opacity: 0.5,
+    top:7,
+    left: 5,
+    justifyContent: 'center',
   },
   })
   
@@ -204,17 +258,23 @@ const HomeScreen = () => {
               <View style={styles.inditemp}>
                 <View style={styles.tempindicator}></View>
                 <Text style={styles.temptitle}>Temperature</Text>
-                <Text style={styles.tempvalue}>30 °C</Text>
+                <Text style={styles.tempvalue}>{tempval} °C</Text>
                 <Icon name="chevron-right" size={40} color="#444" style={styles.tempbutton} />
               </View>
-              <View style={styles.predicttemp}></View>
+              <View style={styles.predicttemp}>
+                <Text style={styles.predicttempText}>Predicted Temperature in the next 15 mins: {tempval} °C</Text>
+              </View>
           </View>
           <View style={styles.humid}>
               <View style={styles.indihumid}>
                 <View style={styles.humidindicator}></View>
-                
+                <Text style={styles.humidtitle}>Humidity</Text>
+                <Text style={styles.humidvalue}>{humidval} %</Text>
+                <Icon name="chevron-right" size={40} color="#444" style={styles.humidbutton} />
               </View>
-              <View style={styles.predicthumid}></View>
+              <View style={styles.predicthumid}>
+                <Text style={styles.predicthumidText}>Predicted Humidity in the next 15 mins: {humidval} %</Text>
+              </View>
 
           </View>
         </View>
