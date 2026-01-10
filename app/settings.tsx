@@ -1,144 +1,162 @@
-import { StyleSheet, Text, View, useColorScheme, Switch } from "react-native";
-import React from "react";
-import { Colors } from "../constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import Icon from "react-native-vector-icons/Feather";
-import { useState } from "react";
+import React, { useMemo, useState } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Switch,
+  useColorScheme,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../constants/theme';
+import { router } from 'expo-router';
 
-
-const Settings = () => {
-
-  const [enabled, setEnabled] = useState(false);
-
-  const scheme = useColorScheme();
-  const theme = Colors[scheme || "light"];
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      //backgroundColor: "red",
-    },
-    accountHeader: {
-      top: 25,
-      //backgroundColor: "yellow",
-      height: 100,
-    },
-    accountText: {
-      fontSize: 15,
-      fontWeight: "bold",
-      left: 18,
-      color: '#444',
-      opacity: 0.4,
-    },
-    label: {
-      fontSize: 16,
-      fontWeight: "400",
-      left: 10,
-      color: theme.text,
-    },
-    emailText: {
-      fontSize: 14,
-      fontWeight: "300",
-      marginLeft: 'auto',
-      right: 15,
-      color: theme.text,
-      opacity: 0.4,
-    },
-    profilebutton: {
-      marginLeft: 'auto',
-      right: 15,
-      opacity: 0.4,
-    },
-    preferences: {
-      marginTop: 70,
-      paddingHorizontal: 20,
-      //backgroundColor: 'blue',
-      height: 75,
-    },
-    preferText: {
-      fontSize: 15,
-      fontWeight: "bold",
-      left: -5,
-      color: '#444',
-      opacity: 0.4,
-    },
-    notifButton: {
-      marginLeft: 'auto',
-      right: -5,
-    },
-    labelNotif: {
-      fontSize: 16,
-      fontWeight: "400",
-      left: 10,
-      color: theme.text,
-    },
-    support: {
-      //backgroundColor: 'green',
-      marginTop: 50,
-      height: 100,
-    },
-    supportText: {
-      fontSize: 15,
-      fontWeight: "bold",
-      left: 15,
-      color: '#444',
-      opacity: 0.4,
-    },
-  });
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.accountHeader}>
-        <Text style={styles.accountText}>ACCOUNT</Text>
-          <View style={{ marginTop: 20 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 15 }}>
-              <Ionicons name="person-circle-outline" size={22} color='black' />
-              <Text style={styles.label}>Profile</Text>
-              <Icon name="chevron-right" size={22} color={theme.text} style={styles.profilebutton} />
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 15, marginLeft: 15 }}>
-              <Ionicons name="mail-outline" size={22} color='black'/> 
-              <Text style={styles.label}>Email</Text>
-              <Text style={styles.emailText}>jljuanitas@usa.edu.ph</Text>
-            </View>
-          </View>
-      </View>
-
-      <View style={styles.preferences}>
-        <Text style={styles.preferText}>PREFERENCES</Text>
-        <View style={{marginTop: 20}}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginLeft: -5 }}>
-              <Ionicons name="notifications-outline" size={22} color='black' />
-              <Text style={styles.labelNotif}>Notifications</Text>
-      
-              <Switch
-                value={enabled}
-                onValueChange={setEnabled}
-                style={styles.notifButton}
-              />
-            </View>
-        </View>
-      </View>
-
-      <View style={styles.support}>
-        <Text style={styles.supportText}>SUPPORT</Text>
-        <View style={{marginTop: 20}}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 15 }}>
-              <Ionicons name="person-circle-outline" size={22} color='black' />
-              <Text style={styles.label}>Help & Support</Text>
-              <Icon name="chevron-right" size={22} color={theme.text} style={styles.profilebutton} />
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 15, marginLeft: 15 }}>
-              <Ionicons name="mail-outline" size={22} color='black'/> 
-              <Text style={styles.label}>About</Text>
-              <Icon name="chevron-right" size={22} color={theme.text} style={styles.profilebutton} />
-            </View>
-        </View>
-      </View>
-    </View>
-  );
+type RowProps = {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value?: string;
+  onPress?: () => void;
+  rightSlot?: React.ReactNode;
+  disabled?: boolean;
 };
 
-export default Settings;
+const Row = ({ icon, label, value, onPress, rightSlot, disabled }: RowProps) => (
+  <Pressable
+    onPress={onPress}
+    disabled={disabled || !onPress}
+    style={({ pressed }) => [
+      styles.rowBase,
+      pressed && onPress ? styles.rowPressed : null,
+    ]}
+  >
+    <View style={styles.rowLeft}>
+      <Ionicons name={icon} size={20} color={styles.rowIconColor.color} />
+      <Text style={styles.rowLabel}>{label}</Text>
+    </View>
+    <View style={styles.rowRight}>
+      {value ? <Text style={styles.valueText}>{value}</Text> : null}
+      {rightSlot}
+      {onPress ? <Ionicons name="chevron-forward" size={18} color="#999" /> : null}
+    </View>
+  </Pressable>
+);
 
+export default function Settings() {
+  const [notificationsOn, setNotificationsOn] = useState(false);
+  const scheme = useColorScheme();
+  const theme = Colors[scheme || 'light'];
 
+  const themed = useMemo(
+    () =>
+      StyleSheet.create({
+        screen: { flex: 1, backgroundColor: theme.background },
+        section: { marginTop: 16, backgroundColor: theme.background },
+        sectionHeader: {
+          paddingHorizontal: 16,
+          paddingBottom: 6,
+          color: theme.icon,
+          fontSize: 13,
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+        },
+        rowLabel: { color: theme.text },
+        valueText: { color: theme.icon },
+      }),
+    [theme]
+  );
+
+  // bind theme-dependent styles
+  styles.rowLabel = themed.rowLabel;
+  styles.valueText = themed.valueText;
+  styles.rowIconColor = { color: theme.text };
+
+  return (
+    <ScrollView style={themed.screen} contentInsetAdjustmentBehavior="automatic">
+      {/* Account */}
+      <View style={themed.section}>
+        <Text style={themed.sectionHeader}>Account</Text>
+        <Row
+          icon="person-circle-outline"
+          label="Profile"
+          onPress={() => {
+            router.push('/set/profile');
+          }}
+        />
+        <Row
+          icon="mail-outline"
+          label="Email"
+          value="jljuanitas@usa.edu.ph"
+          disabled
+        />
+      </View>
+
+      {/* Preferences */}
+      <View style={themed.section}>
+        <Text style={themed.sectionHeader}>Preferences</Text>
+        <Row
+          icon="notifications-outline"
+          label="Notifications"
+          rightSlot={
+            <Switch
+              value={notificationsOn}
+              onValueChange={setNotificationsOn}
+              style={{ marginLeft: 8 }}
+            />
+          }
+        />
+      </View>
+
+      {/* Support */}
+      <View style={[themed.section, { marginBottom: 32 }]}>
+        <Text style={themed.sectionHeader}>Support</Text>
+        <Row
+          icon="help-buoy-outline"
+          label="Help & Support"
+          onPress={() => router.push('/help')}
+        />
+        <Row
+          icon="link-outline"
+          label="Terms of Service"
+          onPress={() => router.push('/settings/terms-of-service')}
+        />
+      </View>
+    </ScrollView>
+  );
+}
+
+// Base styles; some get themed at runtime
+const styles = StyleSheet.create({
+  rowBase: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 52,
+  },
+  rowPressed: {
+    backgroundColor: '#00000010',
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginLeft: 12,
+  },
+  rowLabel: {
+    marginLeft: 12,
+    color: '#000',
+    fontSize: 16,
+  },
+  valueText: {
+    color: '#666',
+    fontSize: 14,
+  },
+  rowIconColor: { color: '#000' },
+});

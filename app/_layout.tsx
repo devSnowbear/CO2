@@ -1,6 +1,7 @@
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
+import { router } from 'expo-router';
 import {
   Pressable,
   Dimensions,
@@ -88,9 +89,82 @@ export default function RootLayout() {
         <Drawer.Screen name="(tabs)" options={{ title: 'Home' }} />
         <Drawer.Screen name="settings" options={{ title: 'Settings' }} />
         <Drawer.Screen name="help" options={{ title: 'Help & Support' }} />
-      </Drawer>
-    </GestureHandlerRootView>
-  );
+        <Drawer.Screen
+          name="support/privacy-policy"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: true,
+            title: 'Privacy Policy',
+            headerLeft: ({ tintColor }) => (
+              <Pressable onPress={() => router.push('/help')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+                <Ionicons name="chevron-back" size={24} color={tintColor || theme.text} />
+              </Pressable>
+            ),
+            headerRight: () => null,
+          }}
+        />
+        <Drawer.Screen
+          name="support/how-to-use-app"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: true,
+            title: 'How to Use the App',
+            headerLeft: ({ tintColor }) => (
+              <Pressable onPress={() => router.push('/help')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+                <Ionicons name="chevron-back" size={24} color={tintColor || theme.text} />
+              </Pressable>
+            ),
+            headerRight: () => null,
+          }}
+        />
+        <Drawer.Screen
+          name="support/privacy-data"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: true,
+            title: 'Privacy & Data',
+            headerLeft: ({ tintColor }) => (
+              <Pressable onPress={() => router.push('/help')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+                <Ionicons name="chevron-back" size={24} color={tintColor || theme.text} />
+              </Pressable>
+            ),
+            headerRight: () => null,
+          }}
+        />
+        <Drawer.Screen
+          name="support/terms-of-service"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: true,
+            title: 'Terms of Service',
+            headerLeft: ({ tintColor }) => (
+              <Pressable onPress={() => router.push('/help')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+                <Ionicons name="chevron-back" size={24} color={tintColor || theme.text} />
+              </Pressable>
+            ),
+            headerRight: () => null,
+          }}
+        />
+
+        // Settings screens
+          <Drawer.Screen
+          name="set/profile"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: true,
+            title: 'Profile',
+            headerLeft: ({ tintColor }) => (
+              <Pressable onPress={() => router.push('/help')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+                <Ionicons name="chevron-back" size={24} color={tintColor || theme.text} />
+              </Pressable>
+            ),
+            headerRight: () => null,
+          }}
+        />
+        
+    </Drawer>
+  </GestureHandlerRootView>
+);
 }
 
 const styles = StyleSheet.create({
