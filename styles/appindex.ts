@@ -15,6 +15,18 @@ export const createStyles = (
       paddingTop: 25,
       backgroundColor: theme.background,
     },
+    logoContainer: {
+      width: '100%',
+      alignItems: 'flex-start',
+      paddingTop: 20,
+      paddingBottom: 10,
+      backgroundColor: theme.background,
+      left: 10
+    },
+    logo: {
+      width: 120,
+      height: 60,
+    },
     head: {
       color: theme.text,
       fontSize:  25,
@@ -46,37 +58,72 @@ export const createStyles = (
       marginTop:  8,
     },
     chartContainer: {
-      width: "100%",
-      alignItems: "center",
-      marginLeft: 30,
-      marginTop: 20,
+    width: "90%",
+    padding: 20,
+    backgroundColor:  theme.cardBackground,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 20,
+  },
+
+  chartHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 15,
+    },
+    chartTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 4,
+    },
+    chartSubtitle: {
+      fontSize: 12,
+      color: '#888',
+      fontWeight: '400',
+    },
+    chartLegend: {
+      gap: 8,
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    legendDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    legendText: {
+      fontSize: 11,
+      color: '#666',
     },
     relative: {
       width: "100%",
       height: 100,
       marginTop: -100,
-      marginBottom: 20,
+      marginBottom: -20,
     },
     temp: {
       position: "absolute",
       left: 20,
       width: 175,
-      height:  100,
-      borderRadius: 5,
-      borderWidth: 1,
-    },
-    inditemp: {
-      top: 0,
-      left:  0,
-      width: "100%",
       height: 70,
-      borderBottomWidth: 1,
+      borderRadius: 10,
+      backgroundColor: theme.cardBackground,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3, 
     },
-    predicttemp: {
-      width: "100%",
-      height: 30,
-      top: 0,
-    },
+  
     tempindicator: {
       top: 10,
       bottom: 10,
@@ -92,7 +139,7 @@ export const createStyles = (
       top: 10,
       left:  20,
       fontSize:  14,
-      color: "black",
+      color: theme.text,
       opacity: 0.5,
     },
     tempvalue: {
@@ -100,7 +147,7 @@ export const createStyles = (
       bottom: 10,
       left: 20,
       fontSize:  35,
-      color: "black",
+      color: theme.text,
     },
     tempbutton: {
       position: "absolute",
@@ -111,30 +158,16 @@ export const createStyles = (
       position: "absolute",
       right: 20,
       width: 175,
-      height:  100,
-      borderRadius: 5,
-      borderWidth: 1,
-    },
-    indihumid: {
-      top: 0,
-      left: 0,
-      width: "100%",
       height: 70,
-      borderBottomWidth: 1,
+      borderRadius: 10, 
+      backgroundColor: theme.cardBackground,  
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3, 
     },
-    predicthumid: {
-      width: "100%",
-      height: 30,
-      top: 0,
-    },
-    predicttempText: {
-      fontSize: 9,
-      color: "black",
-      opacity: 0.5,
-      top: 7,
-      left: 5,
-      justifyContent: "center",
-    },
+    
     humidindicator: {
       top: 10,
       bottom:  10,
@@ -150,7 +183,7 @@ export const createStyles = (
       top: 10,
       left:  20,
       fontSize: 14,
-      color: "black",
+      color: theme.text,
       opacity: 0.5,
     },
     humidvalue:  {
@@ -158,19 +191,75 @@ export const createStyles = (
       bottom: 10,
       left: 20,
       fontSize: 35,
-      color: "black",
+      color: theme.text,
     },
     humidbutton: {
       position: "absolute",
       top: 20,
       right:  15,
     },
-    predicthumidText: {
-      fontSize: 9,
-      color:  "black",
-      opacity: 0.5,
-      top: 7,
-      left: 5,
-      justifyContent: "center",
+    gaugeContainer: {
+      width: '90%',
+      alignItems: 'center',
+      marginBottom: 80,
     },
+    gaugeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',  // This centers vertically
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    gaugeWrapper: {
+      alignItems: 'center',
+    },
+    gaugeInnerContent: {
+      position: 'absolute',
+      bottom: 35,  // Increased to move text up above the line
+      alignItems: 'center',
+    },
+    gaugeValue: {
+      fontSize: 30,
+      fontWeight: '700',
+      letterSpacing: -1,
+    },
+    gaugePpm: {
+      fontSize: 13,
+      color: '#88888888',
+      fontWeight: '500',
+    },
+    gaugeTextContent: {
+      alignItems: 'flex-start',
+      justifyContent: 'center',  // Center the content vertically
+      flex: 1,
+      marginLeft: 30,
+      marginTop: -50,
+    },
+    statusLabel: {
+      fontSize: 11,
+      color: '#888',
+      fontWeight: '500',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      marginBottom: 8,
+    },
+    statusBadgeLarge: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      backgroundColor: theme.cardBackground,
+      borderRadius: 20,
+      marginBottom: 12,
+    },
+    statusTextLarge: {
+      fontSize: 20,
+      fontWeight: '700',
+    },
+    rangeText: {
+      fontSize: 13,
+      color: '#666',
+      marginBottom: 6,
+    },
+
+    
   });
+
+  

@@ -1,4 +1,4 @@
-import { Text, useColorScheme, View } from "react-native";
+import { Text, useColorScheme, View, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Colors } from "../../constants/theme";
@@ -12,6 +12,8 @@ import {
 } from "../../scripts/firestore";
 import { createStyles, chartWidth } from "../../styles/appindex";
 import { subscribeToRealtimeReadings, RealtimeReading } from "../../scripts/rtdb";
+import { useVoiceAlert } from "../../hooks/useVoiceAlert";
+import { registerForPushNotifications } from "../../services/notificationService";
 
 const HomeScreen = () => {
   const scheme = useColorScheme();
@@ -21,7 +23,7 @@ const HomeScreen = () => {
 
   const [reading, setReading] = useState<Reading | null>(null);
 const [chartData, setChartData] = useState<any[]>([]);
-const [yAxisConfig, setYAxisConfig] = useState({ min: 0, max: 600 }); // ✅ Add this
+const [yAxisConfig, setYAxisConfig] = useState({ min: 0, max: 600 });  
 
   const [realtimeReading, setRealtimeReading] = useState<RealtimeReading | null>(null);
 
@@ -48,15 +50,20 @@ const [yAxisConfig, setYAxisConfig] = useState({ min: 0, max: 600 }); // ✅ Add
     return theme.critical;
   };
 
-    // Subscribe to RTDB for realtime gauge data
-useEffect(() => {
-  const unsubscribe = subscribeToRealtimeReadings((data) => {
-    setRealtimeReading(data);
-  });
+  useEffect(() => {
+    // Request notification permissions
+    registerForPushNotifications();
+  }, []);
 
-  // Cleanup on unmount
-  return () => unsubscribe();
-}, []);
+    // Subscribe to RTDB for realtime gauge data
+  useEffect(() => {
+    const unsubscribe = subscribeToRealtimeReadings((data) => {
+      setRealtimeReading(data);
+    });
+
+    // Cleanup on unmount
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
   (async () => {
@@ -107,7 +114,7 @@ useEffect(() => {
         });
       }
 
-      // ✅ PUT IT HERE - Calculate Y-axis range after building data
+      //Calculate Y-axis range after building data
       const co2Values = data. map((d) => d.value);
       const minValue = Math.min(...co2Values);
       const maxValue = Math.max(...co2Values);
@@ -122,9 +129,9 @@ useEffect(() => {
   })();
 }, []);
 
-  const value =  Math.round(realtimeReading?.co2 ?? 0);
-  const tempval = reading?.predicted?.temperature ?? 0;
-  const humidval = reading?. predicted?.humidity ?? 0;
+  const value = Math.round(realtimeReading?.co2 ?? 0);
+const tempval = realtimeReading?.temperature ?? 0;
+const humidval = realtimeReading?.humidity ?? 0;
 
   const percentage = (value / totalValue) * 100;
 
@@ -132,110 +139,143 @@ useEffect(() => {
   const tempColor = getTempColor(tempval);
   const humidColor = getHumidityColor(humidval);
 
+  // useVoiceAlert(value, tempval, humidval, {
+  //   co2: 100,        // Alert if CO2 > 1000 ppm
+  //   temperature: 35,  // Alert if temp > 35°C
+  //   humidity: 80,     // Alert if humidity > 80%
+  // });
+
   // Create styles with dynamic values
   const styles = createStyles(theme, tempColor, humidColor);
 
   return (
     <View style={styles.container}>
+
+      <View style={styles.logoContainer}>
+  <Image 
+    source={scheme === 'dark' 
+      ? require('../../assets/images/darkLogo.png')  // Logo for dark theme
+      : require('../../assets/images/lightLogo.png')  // Logo for light theme
+    } 
+    style={styles.logo}
+    resizeMode="contain"
+  />
+</View>
+
+      <View style={styles.gaugeContainer}>
+  <View style={styles.gaugeRow}>
+    <View style={styles.gaugeWrapper}>
       <AnimatedCircularProgress
-        size={300}
-        width={60}
+        size={180}
+        width={40}
         fill={percentage}
         tintColor={gaugeColor}
-        backgroundColor={theme.background}
+        backgroundColor="#F0F0F0"
         rotation={270}
         arcSweepAngle={180}
-        lineCap="butt"
+        lineCap="round"
       >
-        {(fill) => (
-          <View style={styles.innerContent}>
-            <Text style={styles. head}>CO2</Text>
-            <Text style={[styles. valueText, { color: gaugeColor }]}>
+        {() => (
+          <View style={styles.gaugeInnerContent}>
+            <Text style={[styles.gaugeValue, { color: gaugeColor }]}>
               {value}
-              <Text style={styles. ppm}>ppm</Text>
+              <Text style={styles.gaugePpm}>  ppm</Text>
             </Text>
             
           </View>
         )}
       </AnimatedCircularProgress>
+    </View>
+    
+    <View style={styles.gaugeTextContent}>
+      <Text style={styles.statusLabel}>Realtime CO₂</Text>
+      <View style={styles.statusBadgeLarge}>
+        <Text style={[styles.statusTextLarge, { color: gaugeColor }]}>
+          {value <= 1000 ? 'Good' : value <= 4999 ? 'Moderate' : 'Critical'}
+        </Text>
+      </View>
+      <Text style={styles.rangeText}>
+        {value <= 1000 ? 'Safe levels' : value <= 4999 ? 'Ventilation recommended' : 'Action required'}
+      </Text>
+    </View>
+  </View>
+</View>
+    
       <View style={styles.relative}>
         <View style={styles.temp}>
-          <View style={styles.inditemp}>
-            <View style={styles. tempindicator}></View>
-            <Text style={styles.temptitle}>Temperature</Text>
-            <Text style={styles. tempvalue}>
-              {reading?.actual?. temperature != null
-                ? `${reading.actual.temperature.toFixed(2)} °C`
-                : "…"}
-            </Text>
-            <Icon
-              name="chevron-right"
-              size={40}
-              color="#444"
-              style={styles.tempbutton}
-            />
-          </View>
-          <View style={styles.predicttemp}>
-            <Text style={styles.predicttempText}>
-              Predicted Temperature in the next 15 mins: {tempval} °C
-            </Text>
-          </View>
+          <View style={styles.tempindicator}></View>
+          <Text style={styles.temptitle}>Temperature</Text>
+          <Text style={styles.tempvalue}>
+            {realtimeReading?.temperature != null
+              ? `${realtimeReading.temperature.toFixed(2)} °C`
+              : "…"}
+          </Text>
         </View>
         <View style={styles.humid}>
-          <View style={styles.indihumid}>
             <View style={styles.humidindicator}></View>
             <Text style={styles.humidtitle}>Humidity</Text>
             <Text style={styles.humidvalue}>
-              {reading?. actual?.humidity != null
-                ? `${reading.actual.humidity.toFixed(2)} %`
-                : "…"}
+              {realtimeReading?.humidity != null
+              ? `${realtimeReading.humidity.toFixed(2)} %`
+              : "…"}
             </Text>
-            <Icon
-              name="chevron-right"
-              size={40}
-              color="#444"
-              style={styles. humidbutton}
-            />
+        </View>
+      </View>
+      
+      <View style={styles.chartContainer}>
+        <View style={styles.chartHeader}>
+        <View>
+          <Text style={styles.chartTitle}>CO₂ Prediction</Text>
+          <Text style={styles.chartSubtitle}>Last 3 hours • Next 15 mins</Text>
+        </View>
+        <View style={styles.chartLegend}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: '#14be42' }]}></View>
+            <Text style={styles.legendText}>Actual</Text>
           </View>
-          <View style={styles.predicthumid}>
-            <Text style={styles.predicthumidText}>
-              Predicted Humidity in the next 15 mins:  {humidval} %
-            </Text>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: '#9B59B6' }]}></View>
+            <Text style={styles.legendText}>Predicted</Text>
           </View>
         </View>
       </View>
-
-      <View style={styles.chartContainer}>
         {chartData.length > 0 ?  (
+          
           <LineChart
             data={chartData}
-            width={chartWidth}
-            height={180}
+            width={chartWidth - 40}  // Subtract padding
+            height={200}  // Increase height slightly
             color="#177AD5"
-            thickness={1}
-            curved={false}
-            yAxisLabelWidth={40}
-            yAxisTextStyle={{ color:  "#444" }}
-            xAxisColor="#888"
-            yAxisColor="#888"
-            xAxisLabelTextStyle={{ color: "#444", fontSize: 10 }}
+            thickness={2}  // Thicker line
+            curved={true}  // Enable curves for smoother look
+            yAxisLabelWidth={28}
+            yAxisTextStyle={{ color: "#666", fontSize: 11 }}
+            xAxisColor="#E0E0E0"  // Lighter axis color
+            yAxisColor="#E0E0E0"
+            xAxisLabelTextStyle={{ color: "#666", fontSize: 10 }}
             yAxisTextNumberOfLines={1}
             textColor="#444"
-            hideRules={true}
+            hideRules={false}  // Show grid lines
+            rulesColor="#F5F5F5"  // Very light grid lines
             noOfSections={5}
             initialSpacing={20}
             endSpacing={20}
             rotateLabel
             yAxisOffset={yAxisConfig.min}
-            maxValue={yAxisConfig.max - yAxisConfig.min}  
-            xAxisLabelsVerticalShift={8}   
-            xAxisLength={chartWidth - 0}  
-            xAxisThickness={1}     
+            maxValue={yAxisConfig.max - yAxisConfig.min}
+            xAxisLabelsVerticalShift={8}
+            xAxisThickness={1}
+            yAxisThickness={1}
+            areaChart={true}  // Add gradient fill under line
+            startFillColor="#177AD5"
+            startOpacity={0.2}
+            endOpacity={0.05}
           />
         ) : (
           <Text style={{ color: theme.text }}>Loading chart... </Text>
         )}
       </View>
+
     </View>
   );
 };
