@@ -11,9 +11,14 @@ export const createStyles = (
   StyleSheet. create({
     container: {
       flex: 1,
-      alignItems: "center",
-      paddingTop: 25,
+      // alignItems: "center",
+      // paddingTop: 25,
       backgroundColor: theme.background,
+    },
+    scrollContent: {
+      alignItems: 'center',
+      paddingTop: 25,
+      paddingBottom: 120, // ADD THIS
     },
     logoContainer: {
       width: '100%',
@@ -258,7 +263,75 @@ export const createStyles = (
       color: '#666',
       marginBottom: 6,
     },
-
+    
+infoSection: {
+      width: '90%',
+      marginTop: 20,
+      marginBottom: 120, // Space for tab bar
+    },
+    infoTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: theme.text,
+      marginBottom: 15,
+    },
+    infoCard: {
+      backgroundColor: theme.cardBackground,
+      borderRadius: 15,
+      padding: 20,
+      marginBottom: 15,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    infoCardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    infoCardTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginLeft: 8,
+    },
+    infoCardText: {
+      fontSize: 14,
+      color: theme.text,
+      lineHeight: 22,
+      opacity: 0.8,
+    },
+    boldText: {
+      fontWeight: '700',
+      color: theme.focused,
+    },
+    guidelineRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    guidelineDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      marginRight: 12,
+    },
+    guidelineTextContainer: {
+      flex: 1,
+    },
+    guidelineTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    guidelineDesc: {
+      fontSize: 13,
+      color: theme.text,
+      opacity: 0.7,
+    },
     
   });
 

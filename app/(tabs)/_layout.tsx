@@ -1,3 +1,8 @@
+
+
+
+
+
 import { Tabs } from 'expo-router';
 import React, { use } from 'react';
 import { View, Text, Dimensions, useColorScheme } from 'react-native';
@@ -17,7 +22,7 @@ export default function TabLayout() {
       tabBarShowLabel: false, 
       tabBarStyle: { 
         position: 'absolute', 
-        bottom: 50, 
+        bottom: 20, 
         marginHorizontal: width * 0.08, // 8% margin on each side
         height: 72, 
         elevation: 0, 

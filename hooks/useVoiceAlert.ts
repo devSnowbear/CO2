@@ -1,40 +1,50 @@
 import { useEffect, useRef } from "react";
-import Tts from "react-native-tts";
+import * as Speech from "expo-speech";
 
-type ThresholdConfig = {
-  co2?: number;
-  temperature?: number;
-  humidity?: number;
+type AlertThresholds = {
+  moderate: number;
+  critical: number;
 };
+
+let lastAlertTime = 0;
+const ALERT_COOLDOWN = 5 * 60 * 1000; // 5 minutes between alerts
 
 export function useVoiceAlert(
   co2: number,
-  temperature: number,
-  humidity: number,
-  thresholds: ThresholdConfig = { co2: 1000, temperature: 35, humidity: 80 }
+  thresholds: AlertThresholds
 ) {
   const lastAlertRef = useRef<string>("");
 
   useEffect(() => {
+    const now = Date.now();
+
+    // Cooldown to avoid spam
+    if (now - lastAlertTime < ALERT_COOLDOWN && lastAlertRef.current !== "") return;
+
     let alertMessage = "";
 
-    if (thresholds.co2 && co2 > thresholds.co2) {
-      alertMessage = `Warning! CO2 level is ${co2} ppm, exceeding safe threshold.`;
-    } else if (thresholds.temperature && temperature > thresholds.temperature) {
-      alertMessage = `Warning! Temperature is ${temperature.toFixed(1)} degrees Celsius.`;
-    } else if (thresholds.humidity && humidity > thresholds.humidity) {
-      alertMessage = `Warning! Humidity is ${humidity.toFixed(1)} percent.`;
+    // Check CO2 levels only
+    if (co2 >= thresholds.critical) {
+      alertMessage = `Critical CO2 levels detected at ${co2} parts per million! Immediate ventilation required!`;
+    } else if (co2 > thresholds.moderate) {
+      alertMessage = `Moderate CO2 levels detected at ${co2} parts per million. Consider improving ventilation.`;
     }
 
     // Only speak if there's a new alert and it's different from the last one
     if (alertMessage && alertMessage !== lastAlertRef.current) {
-      Tts.speak(alertMessage);
+      Speech.speak(alertMessage, {
+        language: "en-US",
+        pitch: 1.0,
+        rate: 0.85,
+      });
       lastAlertRef.current = alertMessage;
+      lastAlertTime = now;
+      console.log("🔊 Voice Alert:", alertMessage);
     }
 
-    // Clear alert if values return to normal
+    // Clear alert if CO2 returns to normal
     if (!alertMessage) {
       lastAlertRef.current = "";
     }
-  }, [co2, temperature, humidity, thresholds]);
+  }, [co2, thresholds]);
 }
